@@ -1649,3 +1649,44 @@ def draw_game(game):
         draw_evidence_journal_overlay(game)
     if getattr(game, "achievements_panel_open", False) and not game.show_save_prompt:
         draw_achievements_window(game, standalone=False)
+
+
+def draw_lab(game):
+    """Draw the game world with a small laboratory-only interface."""
+    draw_game(game)
+
+    top_bar = pygame.Surface((SCREEN_WIDTH, 104), pygame.SRCALPHA)
+    top_bar.fill((12, 18, 24, 238))
+    game.screen.blit(top_bar, (0, 0))
+
+    bottom_bar = pygame.Surface((SCREEN_WIDTH, 92), pygame.SRCALPHA)
+    bottom_bar.fill((12, 18, 24, 238))
+    game.screen.blit(bottom_bar, (0, SCREEN_HEIGHT - 92))
+
+    title_font = pygame.font.Font(None, 38)
+    text_font = pygame.font.Font(None, 25)
+    status_font = pygame.font.Font(None, 28)
+
+    title = title_font.render("XAI ЛАБОРАТОРИЯ", True, (220, 238, 255))
+    game.screen.blit(title, (24, 18))
+
+    level_id = getattr(game.lab_session, "level_id", "-")
+    subtitle = text_font.render(
+        f"Фиксированная сцена: {level_id}  |  без магазина, кампании и сохранений",
+        True,
+        (150, 180, 205),
+    )
+    game.screen.blit(subtitle, (26, 60))
+
+    paused = bool(getattr(game.lab_session, "paused", False))
+    status = "ПАУЗА" if paused else "СЦЕНА РАБОТАЕТ"
+    status_color = (255, 205, 110) if paused else (125, 225, 165)
+    status_surface = status_font.render(status, True, status_color)
+    game.screen.blit(status_surface, (24, SCREEN_HEIGHT - 68))
+
+    controls = text_font.render(
+        "Стрелки / WASD — движение    Space — пауза    R — сброс    Esc — меню",
+        True,
+        (220, 228, 235),
+    )
+    game.screen.blit(controls, (220, SCREEN_HEIGHT - 65))

@@ -30,6 +30,7 @@ import assets
 from ghost import GhostManager, EVIDENCE_PROFILE_KEYS
 from inventory_system import InventoryManager, SESSION_BOOST_CATALOG, ItemType, get_max_carried_items
 import level_config
+from lab_mode import LabSession
 from progression import (
     GoogleSheetsAchievementTableProvider,
     LocalAchievementTableProvider,
@@ -178,6 +179,7 @@ class Game:
             PinButton(160, 500, self.pin_images.get("pin_3"), "Слоты"),
             PinButton(675, 470, self.pin_images.get("pin_1"), "Выход"),
             PinButton(430, 500, self.pin_images.get("pin_3"), "Достижения"),
+            PinButton(790, 330, self.pin_images.get("pin_2"), "XAI лаборатория"),
         ]
         self.howto_back_button = Button(50, 50, 160, 44, "Назад", RED)
         self.achievements_back_button = Button(50, 50, 160, 44, "Назад", RED)
@@ -397,6 +399,9 @@ class Game:
         
         # Менеджер приведений
         self.ghost_manager = GhostManager()
+
+        # Учебная лаборатория живёт отдельно от кампании и сохранений.
+        self.lab_session = LabSession()
         
         # Менеджер инвентаря
         self.inventory_manager = InventoryManager(self)
@@ -1568,6 +1573,27 @@ class Game:
                 # Перезагружаем уровень для текущего уровня
                 self.load_level_for_current_level()
 
+    def open_lab(self):
+        """Open the fixed educational scene without touching campaign saves."""
+        self.push_state(GameState.LAB)
+        self.lab_session.enter(self)
+
+    def update_lab_scene(self):
+        """Run only the systems needed by the educational laboratory."""
+        if not self.lab_session.updates_enabled:
+            self.moving = False
+            return
+        mechanics.update_player_movement(self)
+        self.ghost_manager.update(
+            self.player_rect,
+            self.walls,
+            self.level_hitboxes,
+            projector_zones=[],
+            dropped_items=[],
+            world_width=self.world_width,
+            world_height=self.world_height,
+        )
+
     def push_state(self, new_state):
         if new_state != self.state:
             self.state_stack.append(self.state)
@@ -1648,6 +1674,9 @@ class Game:
                 for key in self.keys_pressed:
                     self.keys_pressed[key]=False
             draws.draw_game(self)
+        elif self.state == GameState.LAB:
+            self.update_lab_scene()
+            draws.draw_lab(self)
         elif self.state == GameState.SHOP:
             self.moving = False
             # Как таймер в фургоне Phasmo: countdown идёт, пока смотришь «компьютер».
