@@ -20,3 +20,15 @@ class LabSession:
     @property
     def updates_enabled(self):
         return not self.paused
+
+    def toggle_pause(self):
+        """Pause or resume the laboratory and return the new state."""
+        self.paused = not self.paused
+        return self.paused
+
+    def reset(self, game):
+        """Restore the fixed scene without changing campaign progress."""
+        self.paused = False
+        self.reset_count += 1
+        game.load_level_by_id(self.level_id)
+        game.reset_player_position()

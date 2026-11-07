@@ -44,9 +44,21 @@ def handle_menu_events(game, event):
 
 
 def handle_lab_events(game, event):
-    """Handle basic movement; lesson controls are added in the student step."""
-    if event.type == pygame.KEYDOWN and event.key in game.keys_pressed:
-        game.keys_pressed[event.key] = True
+    """Handle movement and the three controls used in the laboratory lesson."""
+    if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_SPACE:
+            game.lab_session.toggle_pause()
+            return
+        if event.key == pygame.K_r:
+            game.lab_session.reset(game)
+            return
+        if event.key == pygame.K_ESCAPE:
+            for key in game.keys_pressed:
+                game.keys_pressed[key] = False
+            game.go_back()
+            return
+        if event.key in game.keys_pressed:
+            game.keys_pressed[event.key] = True
     elif event.type == pygame.KEYUP and event.key in game.keys_pressed:
         game.keys_pressed[event.key] = False
 
