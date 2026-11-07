@@ -39,6 +39,16 @@ def handle_menu_events(game, event):
                 game.running=False
             elif i==5:  # Достижения
                 game.push_state(GameState.ACHIEVEMENTS)
+            elif i==6:  # Учебная лаборатория
+                game.open_lab()
+
+
+def handle_lab_events(game, event):
+    """Handle basic movement; lesson controls are added in the student step."""
+    if event.type == pygame.KEYDOWN and event.key in game.keys_pressed:
+        game.keys_pressed[event.key] = True
+    elif event.type == pygame.KEYUP and event.key in game.keys_pressed:
+        game.keys_pressed[event.key] = False
 
 
 def handle_howto_events(game, event):
@@ -514,6 +524,8 @@ def handle_event(game):
             handle_settings_events(game, event)
         elif game.state == GameState.GAME:
             handle_game_events(game, event)
+        elif game.state == GameState.LAB:
+            handle_lab_events(game, event)
         elif game.state == GameState.DIFF:
             handle_difficulty_events(game, event)
         elif game.state == GameState.SAVES:

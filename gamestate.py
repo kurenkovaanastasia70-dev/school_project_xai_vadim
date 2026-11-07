@@ -1,6 +1,7 @@
 class GameState:
     MENU = "menu"
     GAME = "game"
+    LAB = "lab"
     SHOP = "shop"
     SETTINGS = "settings"
     DIFF = "diff"
